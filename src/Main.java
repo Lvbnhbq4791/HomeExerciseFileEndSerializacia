@@ -5,10 +5,11 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         var products = new String[]{"Сыр", "Колбаса", "Макароны"};
         int[] prices = new int[]{65, 152, 78};
-        File textFile = new File("basket.txt");
+        File textFile = new File("basket.bin");
         Basket basket = new Basket(products, prices);
         if (textFile.exists()) {
-            Basket.loadFromTxtFile(textFile);
+//            Basket.loadFromTxtFile(textFile);
+            Basket.loadFromBinFile(textFile);
         }
         System.out.println("Список возможных товаров для покупки");
         int n = 1;
@@ -24,7 +25,8 @@ public class Main {
             if ("end".equals(input)) {
                 System.out.println("Ваша корзина:");
                 System.out.println(basket.printCart());
-                basket.saveTxt(textFile);
+//                basket.saveTxt(textFile);
+                basket.saveBin(textFile);
                 break;
             }
             String[] vibor = input.split(" ");
@@ -38,3 +40,4 @@ public class Main {
         }
     }
 }
+

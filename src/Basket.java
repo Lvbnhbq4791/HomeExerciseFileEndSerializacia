@@ -2,7 +2,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.function.Predicate;
 
-public class Basket {
+public class Basket implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     protected String[] products;
     protected int[] prices;
     protected String cart;
@@ -55,6 +57,15 @@ public class Basket {
         }
     }
 
+    public void saveBin(File file) {
+        try (FileOutputStream fil = new FileOutputStream(file);
+             ObjectOutputStream oOs = new ObjectOutputStream(fil)) {
+            oOs.writeObject(cart);
+        } catch (IOException exit) {
+            System.out.println(exit.getMessage());
+        }
+    }
+
     public static void loadFromTxtFile(File textFile) {
         try (BufferedReader imp = new BufferedReader(new FileReader(textFile))) {
             String newString;
@@ -67,6 +78,23 @@ public class Basket {
                 }
             }
         } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void loadFromBinFile(File file) {
+        try (FileInputStream fil = new FileInputStream(file);
+             ObjectInputStream oIs = new ObjectInputStream(fil)) {
+            String[] lineString = ((String) oIs.readObject()).split("\n");
+            for (String line : lineString) {
+                String[] strings = line.split(" ", 7);
+                if (!strings[0].equals("Итого:")) {
+                    tovar.add(strings[0]);
+                    quantity.add(Integer.parseInt(strings[1]));
+                    sum.add(Integer.parseInt(strings[5]));
+                }
+            }
+        } catch (IOException | ClassNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
     }
