@@ -1,8 +1,12 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Basket {
     protected String[] products;
@@ -22,6 +26,7 @@ public class Basket {
     }
 
     public void addToCart(int productNum, int amount) {
+//        Predicate<String> proverka  = p->tovar.contains(p);
         Predicate<String> proverka = tovar::contains;
         if (proverka.test(products[productNum])) {
             int ind = tovar.indexOf(products[productNum]);
@@ -48,7 +53,7 @@ public class Basket {
             sumItog += sum.get(i);
         }
         sborka.append("Итого: ").append(sumItog).append(" руб.");
-        return cart= sborka.toString();
+        return cart = sborka.toString();
     }
 
     public void saveTxt(File textFile1) {
@@ -56,6 +61,28 @@ public class Basket {
             out.write(cart);
         } catch (IOException exit) {
             System.out.println(exit.getMessage());
+        }
+    }
+
+    public void saveJson(File jsonFile) {
+        JSONObject basketJson = new JSONObject();
+        JSONArray basketArrayJson = new JSONArray();
+        try (FileWriter file = new FileWriter(jsonFile)) {
+            for (int i = 0; i < tovar.size(); i++) {
+                ArrayList<String> productss = new ArrayList<>(List.of(products));
+                int j = productss.indexOf(tovar.get(i));
+                JSONObject productInfo = new JSONObject();
+                productInfo.put("tovar", tovar.get(i));
+                productInfo.put("quantity", quantity.get(i));
+                productInfo.put("prices", prices[j]);
+                productInfo.put("sum", sum.get(i));
+                basketArrayJson.add(productInfo);
+            }
+            basketJson.put("Basket", basketArrayJson);
+            file.write(basketJson.toJSONString());
+            file.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -74,4 +101,23 @@ public class Basket {
             System.out.println(ex.getMessage());
         }
     }
+
+    public static void loadFromJsonFile(File jsonFile) {
+        JSONParser jsonParser = new JSONParser();
+        try {
+            Object object = jsonParser.parse(new FileReader(jsonFile));
+            JSONObject basketParsedJson = (JSONObject) object;
+            JSONArray basketJson = (JSONArray) basketParsedJson.get("Basket");
+            for (Object amount : basketJson) {
+                JSONObject bJson = (JSONObject) amount;
+                tovar.add((String) bJson.get("tovar"));
+                quantity.add(Math.toIntExact((Long) bJson.get("quantity")));
+                sum.add(Math.toIntExact((Long) bJson.get("sum")));
+            }
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

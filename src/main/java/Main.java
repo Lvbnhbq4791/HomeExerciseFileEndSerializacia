@@ -1,15 +1,20 @@
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         Scanner scanner = new Scanner(System.in);
         var products = new String[]{"Сыр", "Колбаса", "Макароны"};
         int[] prices = new int[]{65, 152, 78};
-        File textFile = new File("basket.txt");
         Basket basket = new Basket(products, prices);
-        if (textFile.exists()) {
-            Basket.loadFromTxtFile(textFile);
-        }
+        Config config = new Config();
+        config.configload();
+        ClientLog clientLog = new ClientLog();
         System.out.println("Список возможных товаров для покупки");
         int n = 1;
         for (int i = 0; i < products.length; i++) {
@@ -22,9 +27,10 @@ public class Main {
             System.out.println("Выберите товар и количество или введите `end`");
             String input = scanner.nextLine();
             if ("end".equals(input)) {
+                config.configLog(clientLog);
                 System.out.println("Ваша корзина:");
                 System.out.println(basket.printCart());
-                basket.saveTxt(textFile);
+                config.configsave(basket);
                 break;
             }
             String[] vibor = input.split(" ");
@@ -34,6 +40,7 @@ public class Main {
                 System.out.println("Не коректное колличество введите снова");
                 break;
             }
+            clientLog.log(productNumber, amount);
             basket.addToCart(productNumber, amount);
         }
     }
