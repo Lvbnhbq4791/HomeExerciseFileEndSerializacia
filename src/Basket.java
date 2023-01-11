@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
 
 public class Basket {
@@ -36,9 +38,11 @@ public class Basket {
         StringBuilder sborka = new StringBuilder();
         int sumItog = 0;
         for (int i = 0; i < tovar.size(); i++) {
+            ArrayList<String> productss = new ArrayList<>(List.of(products));
+            int j = productss.indexOf(tovar.get(i));
             sborka.append(tovar.get(i)).append(" ")
                     .append(quantity.get(i)).append(" шт. ")
-                    .append(prices[i]).append(" руб/шт ")
+                    .append(prices[j]).append(" руб/шт ")
                     .append(sum.get(i)).append(" руб в сумме;")
                     .append(System.lineSeparator());
             sumItog += sum.get(i);
